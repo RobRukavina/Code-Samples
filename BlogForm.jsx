@@ -154,66 +154,7 @@ class BlogForm extends React.Component {
                                   {errors.blogTypeId}
                                 </span>
                               )}
-                            </div>
-                          </div>
-                        </FormGroup>
-                        <FormGroup>
-                          <div className="row form-group">
-                            <label
-                              htmlFor="inputTitle"
-                              className="col-sm-3 col-form-label"
-                            >
-                              Title
-                            </label>
-                            <div className="col-sm-9">
-                              <Field
-                                className={
-                                  errors.title && touched.title
-                                    ? "form-control is-invalid"
-                                    : "form-control"
-                                }
-                                name="title"
-                                type="text"
-                                placeholder="Title"
-                                value={values.title}
-                                autoComplete="off"
-                              />
-                              {errors.title && touched.title && (
-                                <span className="input-feedback">
-                                  {errors.title}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </FormGroup>
-                        <FormGroup>
-                          <div className="row form-group">
-                            <label
-                              htmlFor="inputSubject"
-                              className="col-sm-3 col-form-label"
-                            >
-                              Subject
-                            </label>
-                            </div>
-                        <FormGroup>
-                          <div className="row form-group">
-                            <label
-                              htmlFor="inputImageUrl"
-                              className="col-sm-3 col-form-label"
-                            >
-                              Image Url
-                            </label>
-                            <div className="col-sm-9">
-                              <Field
-                                name="imageUrl"
-                                className={
-                                  errors.imageUrl && touched.imageUrl
-                                    ? "form-control is-invalid"
-                                    : "form-control"
-                                }
-                                type="url"
-                                placeholder="Input Image URL"
-                                value={values.imageUrl}
+                   
                               />
                               {errors.imageUrl && touched.imageUrl && (
                                 <span className="input-feedback">
