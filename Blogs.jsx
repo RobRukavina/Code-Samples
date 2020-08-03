@@ -124,7 +124,7 @@ class Blogs extends React.Component {
     const frontBlog = this.state.blogs.length > 0 ? this.state.blogs[0] : null;
     const topBlog = this.state.blogs.length > 1 ? this.state.blogs[1] : null;
     const bottomBlog = this.state.blogs.length > 2 ? this.state.blogs[2] : null;
-
+// Some code removed to be fair to my client
     if (this.shouldIncludeButtons() === true) {
       return (
         <React.Fragment>
@@ -139,72 +139,6 @@ class Blogs extends React.Component {
                 Create A New Blog
               </button>
             </div>
-            <div className="container-fluid">
-              <div className="row">
-                {frontBlog && (
-                  <div className="col-xl-6 set-col-12">
-                    <div className="card" style={{ objectFit: "cover" }}>
-                      <div className="blog-box blog-shadow">
-                        <div
-                          className="myImageContainer"
-                          style={{ maxWidth: "100%", maxHeight: "100%" }}
-                        >
-                          <img
-                            src={
-                              frontBlog.imageUrl
-                                ? frontBlog.imageUrl
-                                : "https://cdn.mos.cms.futurecdn.net/iuWB2NM48R2r9q7QhyJfhe-1200-80.jpg"
-                            }
-                            style={{
-                              objectFit: "cover",
-                              height: "100%",
-                              width: "100%",
-                            }}
-                            alt="/universal/static/media/blog-3.2b4c49a1.jpg"
-                            className="img-fluid media"
-                          />
-                        </div>
-                        <div className="blog-details">
-                          <p className="digits">
-                            {moment(frontBlog.datePublish).format("MM/DD/YYYY")}
-                          </p>
-                          <h4>{frontBlog.title}</h4>
-
-                          <ul className="blog-social">
-                            <li>
-                              <i className="icofont icofont-user" />
-                              {frontBlog.author.firstName}{" "}
-                              {frontBlog.author.lastName}
-                            </li>
-                            <li className="digits">
-                              <i className="icofont icofont-thumbs-up" />
-                              02 Hits
-                            </li>
-                            <li className="digits">
-                              <i className="icofont icofont-ui-chat" />
-                              598 Comments
-                            </li>
-                          </ul>
-                          <div
-                            className="inline"
-                            style={{
-                              alignSelf: "center",
-                              paddingTop: "1rem",
-                            }}
-                          >
-                            <button
-                              className="btn btn-primary"
-                              onClick={this.onReadFrontBlog}
-                              type="button"
-                            >
-                              Read More
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
                 <div className="col-xl-6 set-col-12">
                   {topBlog && (
                     <div className="card">

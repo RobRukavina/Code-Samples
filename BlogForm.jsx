@@ -101,7 +101,7 @@ class BlogForm extends React.Component {
     toast.success("Blog has been Deleted", response);
     this.props.history.push("/blogs/admin");
   };
-
+// Some code removed so as to be fair to my client
   render() {
     return (
       <React.Fragment>
@@ -194,55 +194,7 @@ class BlogForm extends React.Component {
                             >
                               Subject
                             </label>
-                            <div className="col-sm-9">
-                              <Field
-                                className={
-                                  errors.subject && touched.subject
-                                    ? "form-control is-invalid"
-                                    : "form-control"
-                                }
-                                name="subject"
-                                placeholder="Subject"
-                                value={values.subject}
-                                autoComplete="off"
-                              />
-                              {errors.subject && touched.subject && (
-                                <span className="input-feedback">
-                                  {errors.subject}
-                                </span>
-                              )}
                             </div>
-                          </div>
-                        </FormGroup>
-                        <FormGroup>
-                          <div className="row form-group">
-                            <label
-                              htmlFor="inputContent"
-                              className="col-sm-3 col-form-label"
-                            >
-                              Content
-                            </label>
-                            <div className="col-sm-9">
-                              <Field
-                                name="content"
-                                placeholder="Content"
-                                component="textarea"
-                                rows="6"
-                                className={
-                                  errors.content && touched.content
-                                    ? "form-control is-invalid"
-                                    : "form-control"
-                                }
-                                value={values.content}
-                              />
-                              {errors.content && touched.content && (
-                                <span className="input-feedback">
-                                  {errors.content}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </FormGroup>
                         <FormGroup>
                           <div className="row form-group">
                             <label
