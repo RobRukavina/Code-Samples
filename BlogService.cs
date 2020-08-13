@@ -184,7 +184,7 @@ namespace Sabio.Services
                     totalCount = reader.GetSafeInt32(startingIndex++);
                     if (list == null)
                     {
-                        list = new List<Blog>();
+                        list = new List<Blog>(startingIndex++);
                     }
                     list.Add(aBlog);
                 }

@@ -12,6 +12,7 @@ import BlogForm from "../Blogs/BlogForm";
 import { Formik, Form, Field } from "formik";
 import { toast } from "react-toastify";
 import FileUpload from "../files/FileUpload";
+import blogSearchSchema from "../../schemas/blogSearchSchema";
 
 class Blogs extends React.Component {
   constructor(props) {
@@ -44,18 +45,10 @@ class Blogs extends React.Component {
 
   handleSearch = (values) => {
     blogService
-      .searchBlog(values.search)
-      .then(this.onSearchSuccess)
+      .searchBlog(this.state.pageIndex, this.state.pageSize, values.search)
+      .then(this.onGetAllSuccess)
       .catch(this.onSearchError);
     _logger("searching for", values.search);
-  };
-
-  onSearchSuccess = (response) => {
-    _logger("search returns", response);
-    toast("success", { autoDismiss: 1 });
-    this.setState((prevState) => {
-      return { ...prevState, blogs: response.item.pagedItems };
-    });
   };
 
   onSearchError = (error) => {
@@ -213,9 +206,10 @@ class Blogs extends React.Component {
               enableReinitialize={true}
               initialValues={this.state.searchTerms}
               onSubmit={this.handleSearch}
+              validationSchema={blogSearchSchema}
             >
               {(props) => {
-                const { values } = props;
+                const { values, isValid } = props;
                 return (
                   <React.Fragment>
                     <div className="blogs-page-body">
@@ -250,6 +244,7 @@ class Blogs extends React.Component {
                                 <button
                                   className="btn btn-primary"
                                   type="submit"
+                                  disabled={!isValid}
                                 >
                                   Search
                                 </button>
@@ -517,12 +512,13 @@ class Blogs extends React.Component {
               enableReinitialize={true}
               initialValues={this.state.searchTerms}
               onSubmit={this.handleSearch}
+              validationSchema={blogSearchSchema}
             >
               {(props) => {
-                const { values, handleSearch } = props;
+                const { values, isValid } = props;
                 return (
                   <React.Fragment>
-                   {/* Some Code Removed */}
+                    {/* Code Removed */}
                   </React.Fragment>
                 );
               }}

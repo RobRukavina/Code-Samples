@@ -77,10 +77,10 @@ const getByCreatedBy = (data) => {
     .catch(serviceHelper.onGlobalError);
 };
 
-const searchBlog = (search) => {
+const searchBlog = (pageIndex, pageSize, search) => {
   const config = {
     method: "GET",
-    url: endpoint + `search?pageIndex=0&pageSize=10&searchCriteria=${search}`,
+    url: `${endpoint}searchPaginate?pageIndex=${pageIndex}&pageSize=${pageSize}&searchCriteria=${search}`,
     crossdomain: true,
     headers: { "Content-Type": "application/json" },
   };
