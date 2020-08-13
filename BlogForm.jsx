@@ -20,33 +20,70 @@ class BlogForm extends React.Component {
         subject: "",
         content: "",
         isPublished: false,
-        imageUrl: "",
         datePublish: "",
       },
       showModal: false,
+      blogTypes: [],
     };
   }
 
   componentDidMount = () => {
+    this.getTypes();
+    _logger("Blog Types From ComponentDidMount", this.state.blogTypes);
     if (this.props.blog) {
-      this.setState(() => {
-        return (this.formValues = {
+      this.setState({
+        formValues: {
+          id: this.props.blog.id,
           blogTypeId: this.props.blog.blogTypeId,
           title: this.props.blog.title,
           subject: this.props.blog.subject,
           content: this.props.blog.content,
           isPublished: this.props.blog.isPublished,
-          imageUrl: this.props.blog.imageUrl,
           datePublish: moment(this.props.blog.datePublish).format("YYYY-MM-DD"),
-        });
+        },
       });
-      _logger("formValues from props", this.state.formValues);
+      _logger("formValues from props", this.props.blog);
     }
+  };
+
+  getTypes = () => {
+    blogService
+      .getAllBlogTypes()
+      .then(this.onGetTypesSuccess)
+      .catch(this.onGetTypesError);
+  };
+
+  mapTypes = (option) => {
+    return (
+      <option key={option.id} value={option.id}>
+        {option.name}
+      </option>
+    );
+  };
+
+  onGetTypesSuccess = (response) => {
+    _logger("BlogTypes", response);
+    let options = response.item.map(this.mapTypes);
+    this.setState(() => {
+      return { blogTypes: options };
+    });
+  };
+
+  onGetTypesError = (error) => {
+    _logger("BlogTypes", error);
   };
 
   showSaveSuccess = (response) => {
     _logger(response, "showSaveSuccess");
     toast("Success", { autoDismiss: 1 });
+    this.props.getById();
+    this.props.closeModal();
+  };
+
+  onSaveSuccess = (response) => {
+    _logger(response, "showSaveSuccess");
+    toast("Success", { autoDismiss: 1 });
+    this.props.closeModal();
   };
 
   onSaveErrorGeneric = (error) => {
@@ -56,7 +93,7 @@ class BlogForm extends React.Component {
 
   handleSubmit = (formValues) => {
     _logger(formValues);
-
+    formValues.blogTypeId = parseInt(formValues.blogTypeId);
     const blog = {
       id: formValues.id,
       blogTypeId: formValues.blogTypeId,
@@ -64,11 +101,15 @@ class BlogForm extends React.Component {
       subject: formValues.subject,
       content: formValues.content,
       isPublished: formValues.isPublished,
-      imageUrl: formValues.imageUrl,
+      imageUrl: this.props.currentImages
+        ? this.props.currentImages[0].url
+        : this.props.blog.imageUrl
+        ? this.props.blog.imageUrl
+        : "",
       datePublish: formValues.datePublish,
     };
 
-    if (this.state.formValues.id) {
+    if (formValues.id) {
       blogService
         .updateBlog(blog)
         .then(this.showSaveSuccess)
@@ -76,18 +117,18 @@ class BlogForm extends React.Component {
     } else {
       blogService
         .addBlog(blog)
-        .then(this.showSaveSuccess)
+        .then(this.onSaveSuccess)
         .catch(this.onSaveErrorGeneric);
     }
   };
-  onCancel = (resetForm) => {
-    resetForm();
+
+  onCancel = () => {
     this.props.closeModal();
   };
 
   handleDelete = () => {
     blogService
-      .deleteBlog(this.state.formValues.id)
+      .deleteBlog(this.props.blog.id)
       .then(this.onDeleteSuccess)
       .catch(this.onDeleteError);
   };
@@ -100,8 +141,9 @@ class BlogForm extends React.Component {
     _logger("Blog has been Deleted", response);
     toast.success("Blog has been Deleted", response);
     this.props.history.push("/blogs/admin");
+    this.props.closeModal();
   };
-// Some code removed so as to be fair to my client
+
   render() {
     return (
       <React.Fragment>
@@ -117,7 +159,6 @@ class BlogForm extends React.Component {
               touched,
               errors,
               handleSubmit,
-              resetForm,
               isValid,
               isSubmitting,
             } = props;
@@ -134,89 +175,32 @@ class BlogForm extends React.Component {
                               htmlFor="inputBlogTypeId"
                               className="col-sm-3 col-form-label"
                             >
-                              Blog Type Id
+                              Blog Category
                             </label>
                             <div className="col-sm-9">
                               <Field
+                                name="blogTypeId"
+                                component="select"
+                                values={values.blogTypeId}
+                                label="BlogTypes"
                                 className={
                                   errors.blogTypeId && touched.blogTypeId
                                     ? "form-control is-invalid"
                                     : "form-control"
                                 }
-                                type="number"
-                                autoComplete="off"
-                                name="blogTypeId"
-                                placeholder="Blog Type Id"
-                                value={values.blogTypeId}
-                              />
+                              >
+                                <option value="">Select Category</option>
+                                {this.state.blogTypes}
+                              </Field>
                               {errors.blogTypeId && touched.blogTypeId && (
                                 <span className="input-feedback">
                                   {errors.blogTypeId}
                                 </span>
                               )}
-                   
-                              />
-                              {errors.imageUrl && touched.imageUrl && (
-                                <span className="input-feedback">
-                                  {errors.imageUrl}
-                                </span>
-                              )}
                             </div>
                           </div>
                         </FormGroup>
-                        <FormGroup>
-                          <div className="row form-group">
-                            <label
-                              htmlFor="inputDatePublish"
-                              className="col-sm-3 col-form-label"
-                            >
-                              Date Published
-                            </label>
-                            <div className="col-sm-9">
-                              <Field
-                                className={
-                                  errors.datePublish && touched.datePublish
-                                    ? "form-control is-invalid"
-                                    : "form-control"
-                                }
-                                name="datePublish"
-                                type="date"
-                                placeholder="Desired Publish Date"
-                                value={values.datePublish}
-                              />
-                              {errors.datePublish && touched.datePublish && (
-                                <span className="input-feedback">
-                                  {errors.datePublish}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </FormGroup>
-                        <FormGroup>
-                          <div className="form-group m-checkbox-inline mb-0 sm-mb-checkbox">
-                            <label>
-                              Blog is Published
-                              <div className="checkbox checkbox-primary">
-                                <FastField
-                                  name="isPublished"
-                                  value={true}
-                                  render={({ field }) => (
-                                    <input
-                                      style={{
-                                        opacity: "unset",
-                                      }}
-                                      {...field}
-                                      type="checkbox"
-                                      name="isPublished"
-                                      checked={props.values.isPublished}
-                                      value="true"
-                                    />
-                                  )}
-                                />
-                              </div>
-                            </label>
-                          </div>
-                        </FormGroup>
+                                {/* Some Code Removed */}
                         <div
                           className="inline"
                           style={{ justifyContent: "center" }}
@@ -230,7 +214,7 @@ class BlogForm extends React.Component {
                           </button>
                           <button
                             type="button"
-                            onClick={() => this.onCancel(resetForm)}
+                            onClick={this.onCancel}
                             className="btn btn-secondary"
                           >
                             Cancel
@@ -271,8 +255,12 @@ BlogForm.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }),
+  currentImages: PropTypes.arrayOf({
+    currentImages: PropTypes.url,
+  }),
   closeModal: PropTypes.func,
   handleDelete: PropTypes.func,
+  getById: PropTypes.func,
 };
 
 export default BlogForm;

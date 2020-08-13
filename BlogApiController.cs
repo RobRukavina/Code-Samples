@@ -92,6 +92,35 @@ namespace Sabio.Web.Api.Controllers
             return StatusCode(code, result);
         }
 
+        [HttpGet("blogTypes")]
+        public ActionResult<ItemResponse<Paged<Blog>>> GetAllTypes()
+        {
+            int code = 200;
+            BaseResponse result = null;
+            try
+            {
+                List<BlogTypes> list = _service.GetAllTypes();
+                if (list == null)
+                {
+                    code = 404;
+                    result = new ErrorResponse("Records Not Found");
+                }
+                else
+                {
+                    result = new ItemResponse<List<BlogTypes>> { Item = list };
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                code = 500;
+                Logger.LogError(ex.ToString());
+                result = new ErrorResponse(ex.Message.ToString());
+            }
+            return StatusCode(code, result);
+        }
+
         [HttpGet("pageinate/current")]
         public ActionResult<ItemResponse<Paged<Blog>>> GetCurrent(int pageIndex, int pageSize)
         {

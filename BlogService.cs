@@ -12,10 +12,11 @@ using System.Net;
 using System.Text;
 
 namespace Sabio.Services
-{// some code removed to not give it all away :)
+{
     public class BlogService : IBlogService
     {
         IDataProvider _data = null;
+
         public BlogService(IDataProvider data)
         {
             _data = data;
@@ -102,6 +103,32 @@ namespace Sabio.Services
             return pagedList;
         }
 
+        public List<BlogTypes> GetAllTypes()
+        {
+            List<BlogTypes> list = null;
+
+            _data.ExecuteCmd(
+                "dbo.BlogTypes_SelectAll",
+                inputParamMapper: delegate (SqlParameterCollection parameterCollection)
+                {
+                },
+                singleRecordMapper: delegate (IDataReader reader, short set)
+                {
+                    BlogTypes aBlogType = MapBlogTypes(reader, out int startingIndex);
+                    if (list == null)
+                    {
+                        list = new List<BlogTypes>();
+                    }
+                    list.Add(aBlogType);
+                }
+                );
+            if (list != null)
+            {
+                list = new List<BlogTypes>(list);
+            }
+            return list;
+        }
+
         public Paged<Blog> Get(int pageIndex, int pageSize, int userId)
         {
             
@@ -180,7 +207,16 @@ namespace Sabio.Services
                     returnParameters: null);
         }
 
-     
+        private static void AddCommonParams(BlogAddRequest model, SqlParameterCollection col)
+        {
+            col.AddWithValue("@BlogTypeId", model.BlogTypeId);
+            col.AddWithValue("@Title", model.Title);
+            col.AddWithValue("@Subject", model.Subject);
+            col.AddWithValue("@Content", model.Content);
+            col.AddWithValue("@IsPublished", model.IsPublished);
+            col.AddWithValue("@ImageUrl", model.ImageUrl);
+            col.AddWithValue("@DatePublish", model.DatePublish);
+        }
 
         private static Blog MapBlog(IDataReader reader, out int startingIndex)
         {
@@ -203,6 +239,16 @@ namespace Sabio.Services
             aBlog.DatePublish = reader.GetSafeDateTime(startingIndex++);
            
             return aBlog;
+        }
+
+        private static BlogTypes MapBlogTypes(IDataReader reader, out int startingIndex)
+        {
+            BlogTypes aBlogType = new BlogTypes();
+            startingIndex = 0;
+            aBlogType.Id = reader.GetSafeInt32(startingIndex++);
+            aBlogType.Name = reader.GetSafeString(startingIndex++);
+
+            return aBlogType;
         }
     }
 }
