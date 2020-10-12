@@ -4,12 +4,10 @@ using Sabio.Models;
 using Sabio.Models.Domain;
 using Sabio.Models.Requests.Blogs;
 using Sabio.Services.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Net;
-using System.Text;
+
 
 namespace Sabio.Services
 {
@@ -147,6 +145,40 @@ namespace Sabio.Services
                 singleRecordMapper: delegate (IDataReader reader, short set)
                 {
                     
+                    Blog aBlog = MapBlog(reader, out int startingIndex);
+                    totalCount = reader.GetSafeInt32(startingIndex++);
+                    if (list == null)
+                    {
+                        list = new List<Blog>(startingIndex++);
+                    }
+                    list.Add(aBlog);
+                }
+                );
+            if (list != null)
+            {
+                pagedList = new Paged<Blog>(list, pageIndex, pageSize, totalCount);
+            }
+            return pagedList;
+        }
+
+        public Paged<Blog> GetByBlogType(int pageIndex, int pageSize, int blogTypeId)
+        {
+
+            Paged<Blog> pagedList = null;
+            List<Blog> list = null;
+            int totalCount = 0;
+
+            _data.ExecuteCmd(
+                "dbo.Blogs_Select_BlogCategory_Details",
+                inputParamMapper: delegate (SqlParameterCollection parameterCollection)
+                {
+                    parameterCollection.AddWithValue("@PageIndex", pageIndex);
+                    parameterCollection.AddWithValue("@PageSize", pageSize);
+                    parameterCollection.AddWithValue("@BlogTypeId", blogTypeId);
+                },
+                singleRecordMapper: delegate (IDataReader reader, short set)
+                {
+
                     Blog aBlog = MapBlog(reader, out int startingIndex);
                     totalCount = reader.GetSafeInt32(startingIndex++);
                     if (list == null)

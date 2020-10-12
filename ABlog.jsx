@@ -6,7 +6,7 @@ import { getBlogById } from "../../services/blogService";
 import toast from "toastr";
 import CommentsByEntity from "../comments/CommentsByEntity";
 import CommentForm from "../comments/CommentForm";
-import { Modal, Container, Button } from "reactstrap";
+import { Modal, Container, Button } from "react-bootstrap";
 import BlogForm from "../Blogs/BlogForm";
 import { NavLink } from "react-router-dom";
 import FileUpload from "../files/FileUpload";
@@ -26,10 +26,12 @@ class ABlog extends React.Component {
         imageUrl: "",
         datePublish: "",
       },
-      showModal: false,
+      editBlogShow: false,
+      commentFormShow: false,
       hasError: false,
       isLoading: true,
       commentUpdate: false,
+      commentCount: 0,
     };
   }
   componentDidMount = () => {
@@ -102,12 +104,12 @@ class ABlog extends React.Component {
     return result;
   };
 
-  handleCloseModal = () => {
-    this.setState({ showModal: false });
+  handleEditBlogShow = () => {
+    this.setState({ editBlogShow: !this.state.editBlogShow });
   };
 
-  handleOpenModal = () => {
-    this.setState({ showModal: true });
+  handleCommentFormShow = () => {
+    this.setState({ commentFormShow: !this.state.commentFormShow });
   };
 
   updateCommentList = (bool) => {
@@ -116,6 +118,14 @@ class ABlog extends React.Component {
         ...prevState,
         commentUpdate: bool,
       };
+    });
+  };
+
+  commentCount = (int) => {
+    _logger("Comment count: " + int);
+
+    this.setState((prevState) => {
+      return { ...prevState, commentCount: int };
     });
   };
 
@@ -128,14 +138,14 @@ class ABlog extends React.Component {
       let onEdit;
 
       onEdit = (
-        <button
+        <Button
           className="btn btn-primary"
           variant="primary"
           type="button"
-          onClick={this.handleOpenModal}
+          onClick={this.handleEditBlogShow}
         >
           Edit
-        </button>
+        </Button>
       );
       if (this.state.blog) {
         if (this.state.blog.id) {
@@ -171,7 +181,7 @@ class ABlog extends React.Component {
                           </li>
                           <li className="digits">
                             <i className="icofont icofont-ui-chat" />
-                            598 Comments
+                            {this.state.commentCount} Comments
                           </li>
                         </ul>
                         <h2>{this.state.blog.title}</h2>
@@ -179,6 +189,14 @@ class ABlog extends React.Component {
                         <div>{onEdit}</div>
                         <div className="single-blog-content-top">
                           <p>{this.state.blog.content}</p>
+                        </div>
+                        <div className="text-center mt-5">
+                          <Button
+                            size="lg"
+                            onClick={this.handleCommentFormShow}
+                          >
+                            Add a comment!
+                          </Button>
                         </div>
                         <section className="comment-box row">
                           <CommentsByEntity
@@ -188,13 +206,43 @@ class ABlog extends React.Component {
                             currentUser={this.props.currentUser}
                             update={this.state.commentUpdate}
                             updateFunc={this.updateCommentList}
+                            commentCount={this.commentCount}
+                            fromBlog={true}
                           />
                           {this.isAdminOrVendor() && (
-                            <CommentForm
-                              entityId={this.state.blog.id}
-                              entityTypeId={this.state.blog.blogTypeId}
-                              update={this.updateCommentList}
-                            />
+                            <Modal
+                              size="lg"
+                              show={this.state.commentFormShow}
+                              onHide={this.handleCommentFormShow}
+                            >
+                              <Modal.Body>
+                                <CommentForm
+                                  commentPlace={"Type your comment here."}
+                                  subjectPlace={
+                                    "Type the subject of your comment here."
+                                  }
+                                  cardTitle={"Comment"}
+                                  cardSummary={
+                                    "Let the author know what you think!"
+                                  }
+                                  entityId={this.state.blog.id}
+                                  entityTypeId={this.state.blog.blogTypeId}
+                                  currentUser={this.props.currentUser}
+                                  {...this.props}
+                                  closeCommentForm={this.handleCommentFormShow}
+                                  update={this.updateCommentList}
+                                ></CommentForm>
+                              </Modal.Body>
+                              <Modal.Footer>
+                                <Button
+                                  size="sm"
+                                  variant="danger"
+                                  onClick={this.handleCommentFormShow}
+                                >
+                                  Cancel
+                                </Button>
+                              </Modal.Footer>
+                            </Modal>
                           )}
                         </section>
                       </div>
@@ -205,7 +253,8 @@ class ABlog extends React.Component {
                   <Modal
                     centered={true}
                     size="lg"
-                    isOpen={this.state.showModal}
+                    show={this.state.editBlogShow}
+                    onHide={this.handleEditBlogShow}
                   >
                     <div className="container-inline fluid">
                       <div
@@ -220,7 +269,7 @@ class ABlog extends React.Component {
                           className="btn-sm btn-danger"
                           type="button"
                           color="red"
-                          onClick={this.handleCloseModal}
+                          onClick={this.handleEditBlogShow}
                         >
                           x
                         </button>
@@ -248,8 +297,8 @@ class ABlog extends React.Component {
                       getById={this.getById}
                       blog={this.state.blog}
                       onEdit={this.handleOpenModal}
-                      closeModal={this.handleCloseModal}
-                      showModal={this.state.showModal}
+                      closeModal={this.handleEditBlogShow}
+                      showModal={this.state.editBlogShow}
                       {...this.props}
                     />
                   </Modal>
@@ -267,7 +316,59 @@ class ABlog extends React.Component {
       if (this.state.blog.id) {
         return (
           <React.Fragment>
-            {/* Some Code Removed */}
+            <div className="page-body">
+              <div className="col-sm-12">
+                <div className="blog-single">
+                  <div className="blog-box blog-details">
+                    <div className="ABlogImageContainer">
+                      <img
+                        src={this.state.blog.imageUrl}
+                        alt=""
+                        className="ABlogImage"
+                      />
+                    </div>
+                    <div className="blog-details">
+                      <ul className="blog-social">
+                        <li className="digits">
+                          {moment(this.state.blog.datePublish).format(
+                            "MM/DD/YYYY"
+                          )}
+                        </li>
+                        <li>
+                          <i className="icofont icofont-user" />
+                          {this.state.blog.author.firstName}{" "}
+                          <span>{this.state.blog.author.lastName}, </span>
+                          Contact By Email: {this.state.blog.author.email}
+                        </li>
+                        <li className="digits">
+                          <i className="icofont icofont-thumbs-up" />
+                          02<span>Hits</span>
+                        </li>
+                        <li className="digits">
+                          <i className="icofont icofont-ui-chat" />
+                          598 Comments
+                        </li>
+                      </ul>
+                      <h2>{this.state.blog.title}</h2>
+                      <h4>{this.state.blog.subject}</h4>
+                      <div className="single-blog-content-top">
+                        <p>{this.state.blog.content}</p>
+                      </div>
+                      <div>
+                        <section className="comment-box row">
+                          <CommentsByEntity
+                            entityId={this.state.blog.id}
+                            entityTypeId={this.state.blog.blogTypeId}
+                            props={this.props}
+                            currentUser={this.props.currentUser}
+                          />
+                        </section>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </React.Fragment>
         );
       }

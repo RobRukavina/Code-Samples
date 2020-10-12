@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Sabio.Data;
 using Sabio.Models;
 using Sabio.Models.Domain;
 using Sabio.Models.Requests.Blogs;
@@ -12,8 +10,7 @@ using Sabio.Web.Controllers;
 using Sabio.Web.Models.Responses;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace Sabio.Web.Api.Controllers
 {
@@ -67,7 +64,7 @@ namespace Sabio.Web.Api.Controllers
         public ActionResult<ItemResponse<Paged<Blog>>> GetAll(int pageIndex, int pageSize)
         {
             int code = 200;
-          BaseResponse result = null;
+            BaseResponse result = null;
             try
             {
                 Paged<Blog> paged = _service.GetAll(pageIndex, pageSize);
@@ -80,7 +77,7 @@ namespace Sabio.Web.Api.Controllers
                 {
                     result = new ItemResponse<Paged<Blog>> { Item = paged };
 
-                  
+
                 }
             }
             catch (Exception ex)
@@ -93,6 +90,7 @@ namespace Sabio.Web.Api.Controllers
         }
 
         [HttpGet("blogTypes")]
+        [AllowAnonymous]
         public ActionResult<ItemResponse<Paged<Blog>>> GetAllTypes()
         {
             int code = 200;
@@ -138,9 +136,9 @@ namespace Sabio.Web.Api.Controllers
                 }
                 else
                 {
-                 
-                  result = new ItemResponse<Paged<Blog>>{ Item = paged };
-                  
+
+                    result = new ItemResponse<Paged<Blog>> { Item = paged };
+
                 }
             }
             catch (Exception ex)
@@ -152,7 +150,33 @@ namespace Sabio.Web.Api.Controllers
             return StatusCode(code, result);
         }
 
-        [HttpGet("search")]
+        [HttpGet("blogCategory")]
+        [AllowAnonymous]
+        public ActionResult<ItemResponse<Paged<Blog>>> GetByBlogType(int pageIndex, int pageSize, int blogTypeId)
+        {
+            int code = 200;
+            BaseResponse result = null;
+            try
+            {
+                Paged<Blog> paged = _service.GetByBlogType(pageIndex, pageSize, blogTypeId);
+                if (paged == null)
+                { code = 404;
+                    result = new ErrorResponse("Records Not Found");
+                }
+                else
+                {
+                    result = new ItemResponse<Paged<Blog>> { Item = paged };
+                } 
+            }
+            catch (Exception ex) {
+                code = 500;
+                Logger.LogError(ex.ToString());
+                new ErrorResponse(ex.Message.ToString());
+            }
+            return StatusCode(code, result);
+        }
+        [HttpGet("searchPaginate")]
+        [AllowAnonymous]
         public ActionResult<ItemResponse<Paged<Blog>>> SearchPaginated(int pageIndex, int pageSize, string searchCriteria)
         {
             int code = 200;

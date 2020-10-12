@@ -1,151 +1,175 @@
 .blogs-header {
-  justify-content: center;
+  justify-content: center !important;
 }
 
 .btnCardFooter {
-  align-self: bottom;
-  align-self: center;
-  padding-bottom: 0.5rem;
-  padding-top: 1rem;
+  align-self: bottom !important;
+  align-self: center !important;
+  padding-bottom: 0.5rem !important;
+  padding-top: 1rem !important;
 }
 
 .blogs-container-fluid {
-  padding: 1rem;
+  padding: 1rem !important;
+  padding-top: 7rem !important;
 }
 
 .blogs-page-body {
-  padding: 1rem;
+  padding: 1rem !important;
 }
 
 .blog-details-padded {
-  padding-left: 4rem;
+  padding-left: 4rem !important;
 }
 
 .frontBlog {
-  padding-left: 0px;
+  padding-left: 0px !important;
 }
 
 .topBlogs {
-  padding-right: 0px;
+  padding-right: 0px !important;
 }
 
 .BlogsImg {
-  max-height: 281px;
-  object-fit: cover;
+  max-height: 281px !important;
+  object-fit: cover !important;
 }
 
 .BlogsImg2 {
-  object-fit: cover;
-  height: 100%;
-  width: 100%;
+  object-fit: cover !important;
+  height: 100% !important;
+  width: 100% !important;
 }
 
 .ABlogImageContainer {
-  width: 100%;
-  object-fit: cover;
+  width: 100% !important;
+  object-fit: cover !important;
   max-height: 600px !important;
 }
 @media (min-width: 576px) {
   .ABlogImageContainer {
-    max-width: 100%;
+    max-width: 100% !important;
   }
 }
 @media (min-width: 768px) {
   .ABlogImageContainer {
-    max-width: 100%;
+    max-width: 100% !important;
   }
 }
 @media (min-width: 992px) {
   .ABlogImageContainer {
-    max-width: 100%;
+    max-width: 100% !important;
   }
 }
 @media (min-width: 1200px) {
   .ABlogImageContainer {
-    max-width: 100%;
+    max-width: 100% !important;
   }
 }
 
 .TopBlogsImageContainer {
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
 }
 @media (min-width: 576px) {
   .TopBlogsImageContainer {
-    max-width: 1200px;
+    max-width: 1200px !important;
   }
 }
 @media (min-width: 768px) {
   .TopBlogsImageContainer {
-    max-width: 1200px;
+    max-width: 1200px !important;
   }
 }
 @media (min-width: 992px) {
   .TopBlogsImageContainer {
-    max-width: 1200px;
+    max-width: 1200px !important;
   }
 }
 @media (min-width: 1200px) {
   .TopBlogsImageContainer {
-    max-width: 1200px;
+    max-width: 1200px !important;
   }
 }
 
 .BlogsImageContainer {
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
 }
 @media (min-width: 576px) {
   .BlogsImageContainer {
-    max-width: 400px;
-    max-height: 400px;
+    max-width: 400px !important;
+    max-height: 400px !important;
   }
 }
 @media (min-width: 768px) {
   .BlogsImageContainer {
-    max-width: 600px;
-    max-height: 200px;
+    max-width: 600px !important;
+    max-height: 200px !important;
   }
 }
 @media (min-width: 992px) {
   .BlogsImageContainer {
-    max-width: 800px;
-    max-height: 400px;
+    max-width: 800px !important;
+    max-height: 400px !important;
   }
 }
 @media (min-width: 1200px) {
   .BlogsImageContainer {
-    max-width: 1200px;
-    max-height: 600px;
+    max-width: 1200px !important;
+    max-height: 600px !important;
   }
 }
 
 .blogSearchBox {
-  height: 1.8rem;
-  width: 15rem;
+  /* margin-left: 67rem; */
+  margin-top: 2px;
+  height: 1.8rem !important;
+  width: 15rem !important;
 }
+
+.blogSearchButton {
+  margin-bottom: 2px;
+}
+
 .BlogDisplayInline {
   display: inline-block !important;
 }
 
-.blogSearchBoxContainer {
-  position: absolute;
-  right: 0;
-  margin-top: -35px;
+.blogSearch {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  position: relative !important;
+  /* margin-top: -35px !important; */
 }
 
 .blogSearchHeader {
-  /* position: absolute; */
-  display: inline-block;
+  display: inline !important;
 }
 
 .BlogsFileUpload {
-  max-width: 77%;
-  margin-left: 6rem;
+  max-width: 77% !important;
+  margin-left: 6rem !important;
 }
 
 .ABlogImage {
-  width: 100%;
-  object-fit: cover;
+  width: 100% !important;
+  object-fit: cover !important;
   max-height: 600px !important;
+}
+
+.blogCategoryForm {
+  position: relative;
+  right: 0px;
+}
+
+.BlogCategoryLabel {
+  display: inline-block !important;
+  font-size: 18;
+  font-weight: bold;
+}
+
+.blogs-wrapper {
+  margin-bottom: "10px";
+  position: relative;
 }

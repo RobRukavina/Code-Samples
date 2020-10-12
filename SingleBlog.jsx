@@ -76,7 +76,44 @@ const SingleBlog = (props) => {
   } else if (shouldIncludeButtons() !== true)
     return (
       <React.Fragment>
-        {/* Some Code Removed */}
+        <div className="mb-4 hover-animate col-sm-6 col-lg-4">
+          <div className="border-0 h-100 shadow card">
+            <div className="BlogsImageContainer">
+              <img
+                src={props.blog.imageUrl}
+                alt=""
+                className="BlogsImg2 card-img-top"
+              />
+            </div>
+            <div className="card-body">
+              <p>{props.blog.subject}</p>
+              <h5 className="my-2">{props.blog.title}</h5>
+              <div className="text-gray-500 text-sm my-3">
+                <i className="far fa-clock mr-2" />
+                <ul className="blog-social">
+                  <li className="digits">
+                    {moment(props.blog.datePublish).format("MM/DD/YYYY")}
+                  </li>
+                  <li className="digits">
+                    {props.blog.author.firstName} {props.blog.author.lastName}
+                  </li>
+                  <li className="digits">0 Hits</li>
+                </ul>
+              </div>
+              <p
+                className="my-2 text-muted text-sm"
+                style={{ maxHeight: "10px" }}
+              >
+                {props.blog.content.slice(0, 100)}
+              </p>
+            </div>
+            <div className="btnCardFooter">
+              <button className="btn btn-primary" onClick={onReadThis}>
+                Read More
+              </button>
+            </div>
+          </div>
+        </div>
       </React.Fragment>
     );
 };

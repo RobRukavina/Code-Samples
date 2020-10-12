@@ -89,6 +89,18 @@ const searchBlog = (pageIndex, pageSize, search) => {
     .catch(serviceHelper.onGlobalError);
 };
 
+const getByBlogCategory = (pageIndex, pageSize, blogType) => {
+  const config = {
+    method: "GET",
+    url: `${endpoint}blogCategory?pageIndex=${pageIndex}&pageSize=${pageSize}&blogTypeId=${blogType}`,
+    crossdomain: true,
+    headers: { "Content-Type": "application/json" },
+  };
+  return axios(config)
+    .then(serviceHelper.onGlobalSuccess)
+    .catch(serviceHelper.onGlobalError);
+};
+
 const deleteBlog = (deletedBlogId) => {
   const config = {
     method: "DELETE",
@@ -110,4 +122,5 @@ export {
   searchBlog,
   deleteBlog,
   getAllBlogTypes,
+  getByBlogCategory,
 };

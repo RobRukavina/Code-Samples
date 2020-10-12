@@ -7,7 +7,7 @@ import SingleBlog from "./SingleBlog";
 import PropTypes from "prop-types";
 import locale from "rc-pagination/lib/locale/en_US";
 import moment from "moment";
-import { Modal, Container, Button } from "reactstrap";
+import { FormGroup, Modal, Container, Button } from "reactstrap";
 import BlogForm from "../Blogs/BlogForm";
 import { Formik, Form, Field } from "formik";
 import { toast } from "react-toastify";
@@ -21,6 +21,7 @@ class Blogs extends React.Component {
     this.state = {
       blogs: [],
       mappedBlogs: [],
+      blogTypes: [],
       searchTerms: { search: "" },
       total: 0,
       pageIndex: 0,
@@ -33,7 +34,35 @@ class Blogs extends React.Component {
 
   componentDidMount = () => {
     _logger("componentDidMount");
+    this.getTypes();
     this.getAll(this.state.pageIndex, this.state.pageSize);
+  };
+
+  getTypes = () => {
+    blogService
+      .getAllBlogTypes()
+      .then(this.onGetTypesSuccess)
+      .catch(this.onGetTypesError);
+  };
+
+  mapTypes = (option) => {
+    return (
+      <option key={option.id} value={option.id}>
+        {option.name}
+      </option>
+    );
+  };
+
+  onGetTypesSuccess = (response) => {
+    _logger("BlogTypes", response);
+    let options = response.item.map(this.mapTypes);
+    this.setState(() => {
+      return { blogTypes: options };
+    });
+  };
+
+  onGetTypesError = (error) => {
+    _logger("BlogTypes", error);
   };
 
   getAll = () => {
@@ -58,6 +87,22 @@ class Blogs extends React.Component {
   };
 
   searchError = () => {
+    this.setState(() => {
+      return { search404: true };
+    });
+  };
+
+  getByCategory = (e) => {
+    var target = e.currentTarget;
+    var value = target.value;
+    blogService
+      .getByBlogCategory(this.state.pageIndex, this.state.pageSize, value)
+      .then(this.onGetAllSuccess)
+      .catch(this.onGetByCategoryError);
+  };
+
+  onGetByCategoryError = () => {
+    _logger("There Was an Error With Your Search");
     this.setState(() => {
       return { search404: true };
     });
@@ -204,8 +249,9 @@ class Blogs extends React.Component {
           <React.Fragment>
             <Formik
               enableReinitialize={true}
-              initialValues={this.state.searchTerms}
+              initialValues={(this.state.searchTerms, this.state.blogTypes)}
               onSubmit={this.handleSearch}
+              onChange={this.getByCategory}
               validationSchema={blogSearchSchema}
             >
               {(props) => {
@@ -214,14 +260,11 @@ class Blogs extends React.Component {
                   <React.Fragment>
                     <div className="blogs-page-body">
                       <div className="container-fluid">
+                        <div className="col-12" style={{ textAlign: "center" }}>
+                          <h4 className="blogs-header">Blogs Home Page</h4>
+                        </div>
                         <div className="blogsSearchHeader row">
-                          <div
-                            className="col-12"
-                            style={{ textAlign: "center" }}
-                          >
-                            <h4 className="blogs-header">Blogs Home Page</h4>
-                          </div>
-                          <div>
+                          <div className="col-md-8">
                             <button
                               className="btn btn-primary"
                               type="button"
@@ -229,8 +272,9 @@ class Blogs extends React.Component {
                             >
                               Create A New Blog
                             </button>
-                            <div className="blogSearchBoxContainer">
-                              <Form>
+                          </div>
+                          <div className="blogSearch col-md-4">
+                                      <Form>
                                 <div className="BlogDisplayInline">
                                   <Field
                                     className="blogSearchBox form-control"
@@ -243,14 +287,36 @@ class Blogs extends React.Component {
                                 </div>
                                 <button
                                   className="btn btn-primary"
+                                  style={{ marginBottom: "8px" }}
                                   type="submit"
                                   disabled={!isValid}
                                 >
                                   Search
                                 </button>
+                                <FormGroup>
+                                  <div className="blogCategoryForm">
+                                    <span className="BlogCategoryLabel">
+                                      Select By Blog Category
+                                    </span>
+                                    <div className="col-sm-9">
+                                      <Field
+                                        name="blogTypeId"
+                                        component="select"
+                                        values={values.blogTypeId}
+                                        label="BlogTypes"
+                                        className="SelectByType"
+                                        onChange={this.getByCategory}
+                                      >
+                                        <option value="">
+                                          Select Category
+                                        </option>
+                                        {this.state.blogTypes}
+                                      </Field>
+                                    </div>
+                                  </div>
+                                </FormGroup>
                               </Form>
                             </div>
-                          </div>
                         </div>
                       </div>
                       <div className="blogs-container-fluid">
@@ -489,16 +555,20 @@ class Blogs extends React.Component {
                         />
                       </Modal>
                     </Container>
-                    <Pagination
-                      pageSize={this.state.pageSize}
-                      pageIndex={this.state.pageIndex}
-                      onChange={this.onChange}
-                      currentPage={this.state.current}
-                      total={this.state.total}
-                      locale={locale}
-                      nextIcon="Next"
-                      prevIcon="Prev"
-                    />
+                    <div className="row justify-content-center">
+                      <div className="rc-pagination mb-2">
+                        <Pagination
+                          pageSize={this.state.pageSize}
+                          pageIndex={this.state.pageIndex}
+                          onChange={this.onChange}
+                          currentPage={this.state.current}
+                          total={this.state.total}
+                          locale={locale}
+                          nextIcon="Next"
+                          prevIcon="Prev"
+                        />
+                      </div>
+                    </div>
                   </React.Fragment>
                 );
               }}
@@ -510,15 +580,261 @@ class Blogs extends React.Component {
           <React.Fragment>
             <Formik
               enableReinitialize={true}
-              initialValues={this.state.searchTerms}
+              initialValues={(this.state.searchTerms, this.state.blogTypes)}
               onSubmit={this.handleSearch}
+              onChange={this.getByCategory}
               validationSchema={blogSearchSchema}
             >
               {(props) => {
                 const { values, isValid } = props;
                 return (
                   <React.Fragment>
-                    {/* Code Removed */}
+                    <div className="blogs-page-body">
+                      <div className="container-fluid">
+                        <div className="col-12" style={{ textAlign: "center" }}>
+                          <h4 className="blogs-header">Blogs Home Page</h4>
+                        </div>
+                        <div className="blogsSearchHeader row">
+                          <div className="col-md-12"
+                            style={{flexDirection: "row-reverse", display: "flex"}}
+                          >
+                            <Form>
+                              <div className="BlogDisplayInline">
+                                <Field
+                                  className="blogSearchBox form-control"
+                                  name="search"
+                                  placeholder="Search Blogs"
+                                  autoComplete="on"
+                                  type="text"
+                                  value={values.search}
+                                ></Field>
+                              </div>
+                              <button
+                                className="btn btn-primary"
+                                type="submit"
+                                disabled={!isValid}
+                              >
+                                Search
+                              </button>
+                              <FormGroup>
+                                <div className="blogCategoryForm">
+                                  <span className="BlogCategoryLabel">
+                                    Select By Blog Category
+                                  </span>
+                                  <div className="col-sm-9">
+                                    <Field
+                                      name="blogTypeId"
+                                      component="select"
+                                      values={values.blogTypeId}
+                                      label="BlogTypes"
+                                      className="SelectByType"
+                                      onChange={this.getByCategory}
+                                    >
+                                      <option value="">Select Category</option>
+                                      {this.state.blogTypes}
+                                    </Field>
+                                  </div>
+                                </div>
+                              </FormGroup>
+                            </Form>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="blogs-container-fluid">
+                        <div className="row">
+                          {frontBlog && (
+                            <div className="frontBlog col-xl-6 set-col-12">
+                              <div className="card">
+                                <div className="blog-box blog-shadow">
+                                  <div className="TopBlogsImageContainer">
+                                    <img
+                                      src={
+                                        frontBlog.imageUrl
+                                          ? frontBlog.imageUrl
+                                          : "https://cdn.mos.cms.futurecdn.net/iuWB2NM48R2r9q7QhyJfhe-1200-80.jpg"
+                                      }
+                                      alt="/universal/static/media/blog-3.2b4c49a1.jpg"
+                                      className="BlogsImg2 card-img-top"
+                                    />
+                                  </div>
+                                  <div className="blog-details">
+                                    <p className="digits">
+                                      {moment(frontBlog.datePublish).format(
+                                        "MM/DD/YYYY"
+                                      )}
+                                    </p>
+                                    <h4>{frontBlog.title}</h4>
+
+                                    <ul className="blog-social">
+                                      <li>
+                                        <i className="icofont icofont-user" />
+                                        {frontBlog.author.firstName}{" "}
+                                        {frontBlog.author.lastName}
+                                      </li>
+                                      <li className="digits">
+                                        <i className="icofont icofont-thumbs-up" />
+                                        02 Hits
+                                      </li>
+                                      <li className="digits">
+                                        <i className="icofont icofont-ui-chat" />
+                                        598 Comments
+                                      </li>
+                                    </ul>
+                                    <div
+                                      className="inline"
+                                      style={{
+                                        alignSelf: "center",
+                                        paddingTop: "1rem",
+                                      }}
+                                    >
+                                      <button
+                                        className="btn btn-primary"
+                                        onClick={this.onReadFrontBlog}
+                                        type="button"
+                                      >
+                                        Read More
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          <div className="topBlogs col-xl-6 set-col-12">
+                            {topBlog && (
+                              <div className="card">
+                                <div className="blog-box blog-list row">
+                                  <div className="col-sm-5">
+                                    <div className="BlogsImageContainer">
+                                      <img
+                                        src={
+                                          topBlog.imageUrl
+                                            ? topBlog.imageUrl
+                                            : "/universal/static/media/blog-3.2b4c49a1.jpg"
+                                        }
+                                        alt="/universal/static/media/blog-3.2b4c49a1.jpg"
+                                        className="img-fluid sm-100-w media"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="col-sm-7">
+                                    <div className="blog-details-padded">
+                                      <div className="blog-date digits">
+                                        {moment(topBlog.datePublish).format(
+                                          "MM/DD/YYYY"
+                                        )}
+                                      </div>
+                                      <h6>{topBlog.title}</h6>
+                                      <div className="blog-bottom-content">
+                                        <ul className="blog-social">
+                                          <li>
+                                            By: {topBlog.author.firstName}{" "}
+                                            {topBlog.author.lastName}
+                                          </li>
+                                          <li className="digits">0 Hits</li>
+                                        </ul>
+                                        <hr />
+                                        <p className="mt-0">
+                                          {topBlog.subject}
+                                        </p>
+                                        <div
+                                          className="inline"
+                                          style={{
+                                            alignSelf: "center",
+                                          }}
+                                        >
+                                          <button
+                                            className="btn btn-primary"
+                                            onClick={this.onReadTopBlog}
+                                            type="button"
+                                          >
+                                            Read More
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {bottomBlog && (
+                              <div className="card">
+                                <div className="blog-box blog-list row">
+                                  <div className="col-sm-5">
+                                    <div className="BlogsImageContainer">
+                                      <img
+                                        src={
+                                          bottomBlog.imageUrl
+                                            ? bottomBlog.imageUrl
+                                            : "/universal/static/media/blog-3.2b4c49a1.jpg"
+                                        }
+                                        style={{
+                                          objectFit: "cover",
+                                          height: "100%",
+                                          width: "100%",
+                                        }}
+                                        alt="/universal/static/media/blog-3.2b4c49a1.jpg"
+                                        className="img-fluid sm-100-w media"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="col-sm-7">
+                                    <div className="blog-details-padded">
+                                      <div className="blog-date digits">
+                                        {moment(bottomBlog.datePublish).format(
+                                          "MM/DD/YYYY"
+                                        )}
+                                      </div>
+                                      <h6>{bottomBlog.title}</h6>
+                                      <div className="blog-bottom-content">
+                                        <ul className="blog-social">
+                                          <li>
+                                            By: {bottomBlog.author.firstName}{" "}
+                                            {bottomBlog.author.lastName}
+                                          </li>
+                                          <li className="digits">02 Hits</li>
+                                        </ul>
+                                        <hr />
+                                        <p className="mt-0">
+                                          {bottomBlog.subject}
+                                        </p>
+                                        <div
+                                          className="inline"
+                                          style={{
+                                            alignSelf: "center",
+                                          }}
+                                        >
+                                          <button
+                                            className="btn btn-primary"
+                                            onClick={this.onReadBottomBlog}
+                                            type="button"
+                                          >
+                                            Read More
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="mb-5 row">
+                            {this.state.mappedBlogs}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <Pagination
+                      pageSize={this.state.pageSize}
+                      pageIndex={this.state.pageIndex}
+                      onChange={this.onChange}
+                      currentPage={this.state.current}
+                      total={this.state.total}
+                      locale={locale}
+                      nextIcon="Next"
+                      prevIcon="Prev"
+                    />
                   </React.Fragment>
                 );
               }}
